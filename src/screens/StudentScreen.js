@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, Button, Image, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert, Image, ScrollView, Text } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import Input from '../components/Input';
+import Button from '../components/Button';
 import { apiService } from '../services/apiService';
 
 export default function StudentScreen() {
@@ -13,7 +14,7 @@ export default function StudentScreen() {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [1, 1],
       quality: 0.7,
     });
     if (!result.canceled) setPhoto(result.assets[0].uri);
@@ -34,22 +35,54 @@ export default function StudentScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Input placeholder="RA do Aluno" value={ra} onChangeText={setRa} keyboardType="numeric" />
-      <Input placeholder="Nome Compledo" value={name} onChangeText={setName} />
-      
-      <View style={styles.photoContainer}>
-        {photo && <Image source={{ uri: photo }} style={styles.photo} />}
-        <Button title={photo ? "Trocar Foto" : "Selecionar Foto"} onPress={pickImage} color="#000" />
-      </View>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.card}>
+        <View style={styles.photoSection}>
+          {photo ? (
+            <Image source={{ uri: photo }} style={styles.photo} />
+          ) : (
+            <View style={styles.photoPlaceholder}>
+              <Text style={styles.placeholderText}>Sem foto</Text>
+            </View>
+          )}
+          <Button 
+            title={photo ? "Alterar Imagem" : "Selecionar Imagem"} 
+            variant="secondary" 
+            onPress={pickImage} 
+          />
+        </View>
 
-      <Button title="Salvar Aluno" onPress={handleSave} color="#000" />
-    </View>
+        <Input label="Registro Acadêmico (RA)" placeholder="Ex: 123456" value={ra} onChangeText={setRa} keyboardType="numeric" />
+        <Input label="Nome Completo" placeholder="Digite o nome do aluno" value={name} onChangeText={setName} />
+        
+        <View style={styles.actionContainer}>
+          <Button title="Salvar Aluno" onPress={handleSave} />
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#FFF' },
-  photoContainer: { alignItems: 'center', marginBottom: 20 },
-  photo: { width: 100, height: 100, borderRadius: 50, marginBottom: 10 }
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  content: { padding: 20 },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  photoSection: { alignItems: 'center', marginBottom: 24 },
+  photo: { width: 120, height: 120, borderRadius: 60, marginBottom: 16, borderWidth: 3, borderColor: '#F1F5F9' },
+  photoPlaceholder: { 
+    width: 120, height: 120, borderRadius: 60, marginBottom: 16, 
+    backgroundColor: '#F1F5F9', alignItems: 'center', justifyContent: 'center',
+    borderWidth: 2, borderColor: '#E2E8F0', borderStyle: 'dashed'
+  },
+  placeholderText: { color: '#94A3B8', fontWeight: '500' },
+  actionContainer: { marginTop: 8 }
 });
