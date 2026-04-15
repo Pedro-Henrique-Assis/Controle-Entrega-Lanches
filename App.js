@@ -1,20 +1,24 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import StudentScreen from './src/screens/StudentScreen';
+import AuthScreen from './src/screens/AuthScreen';
+import ReportScreen from './src/screens/ReportScreen';
+
+const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Tab.Navigator screenOptions={{ 
+        tabBarActiveTintColor: '#000', 
+        headerStyle: { backgroundColor: '#FAFAFA' },
+        headerTitleStyle: { fontWeight: '600' }
+      }}>
+        <Tab.Screen name="Alunos" component={StudentScreen} />
+        <Tab.Screen name="Autorizações" component={AuthScreen} />
+        <Tab.Screen name="Relatórios" component={ReportScreen} />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
