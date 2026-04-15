@@ -11,44 +11,59 @@ export default function ReportScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      // Força modo paisagem ao entrar na tela
       ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
       loadDeliveries();
-      
-      // Retorna para retrato ao sair
       return () => ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
     }, [])
   );
 
   const loadDeliveries = async () => {
     const auths = await apiService.getAuthorizations();
-    // Filtra apenas os entregues
     setDeliveries(auths.filter(a => a.delivered)); 
   };
 
   const filtered = deliveries.filter(d => d.date.includes(dateFilter));
 
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <Text style={styles.dateBadge}>{item.date}</Text>
+        <Text style={styles.status}>Entregue</Text>
+      </View>
+      <Text style={styles.studentInfo}>Aluno ID: {item.studentId}</Text>
+    </View>
+  );
+
   return (
     <View style={styles.container}>
-      <Input placeholder="Filtrar por data..." value={dateFilter} onChangeText={setDateFilter} />
+      <View style={styles.filterContainer}>
+        <Input placeholder="Filtrar por data..." value={dateFilter} onChangeText={setDateFilter} />
+      </View>
       <FlatList
         data={filtered}
         keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.row}>
-            <Text style={styles.cell}>Data: {item.date}</Text>
-            <Text style={styles.cell}>ID Aluno: {item.studentId}</Text>
-            <Text style={styles.status}>Entregue</Text>
-          </View>
-        )}
+        renderItem={renderItem}
+        contentContainerStyle={styles.listContent}
+        numColumns={2}
+        columnWrapperStyle={styles.columnWrapper}
       />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#FFF' },
-  row: { flexDirection: 'row', justifyContent: 'space-between', padding: 15, borderBottomWidth: 1, borderColor: '#EAEAEA' },
-  cell: { fontSize: 16, color: '#333' },
-  status: { fontSize: 16, color: '#2E7D32', fontWeight: 'bold' }
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  filterContainer: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 10 },
+  listContent: { paddingHorizontal: 16, paddingBottom: 24 },
+  columnWrapper: { justifyContent: 'space-between', paddingHorizontal: 8 },
+  card: {
+    backgroundColor: '#FFFFFF', flex: 1, margin: 8, padding: 20, borderRadius: 16,
+    borderLeftWidth: 4, borderLeftColor: '#334155',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05, shadowRadius: 4, elevation: 2,
+  },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  dateBadge: { backgroundColor: '#F1F5F9', paddingVertical: 4, paddingHorizontal: 8, borderRadius: 6, fontSize: 13, fontWeight: '600', color: '#475569' },
+  status: { fontSize: 13, color: '#1E293B', fontWeight: '700', textTransform: 'uppercase' },
+  studentInfo: { fontSize: 15, color: '#334155', fontWeight: '500' }
 });
